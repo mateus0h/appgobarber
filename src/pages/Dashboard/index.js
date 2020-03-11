@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { withNavigationFocus } from 'react-navigation';
 import api from '~/services/api';
@@ -10,6 +12,8 @@ import { Container, Title, List } from './styles';
 
 function Dashboard({ isFocused }) {
   const [appointments, setAppointments] = useState([]);
+
+  const profile = useSelector(state => state.user.profile);
 
   async function loadAppointments() {
     const response = await api.get('appointments');
@@ -24,7 +28,11 @@ function Dashboard({ isFocused }) {
   }, [isFocused]);
 
   async function handleCancel(id) {
-    const response = await api.delete(`appointments/${id}`);
+    const response = await api.delete(`appointments/${id}`, {
+      params: {
+        user_id: profile.id,
+      },
+    });
 
     setAppointments(
       appointments.map(appointment =>
